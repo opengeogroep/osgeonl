@@ -12,9 +12,10 @@
         dojo.ready(function(){
             osgeoclick = {
                 onClick: function(evt){
+                    
                     dojo.io.script.get({
                         url: "http://wiki.osgeo.org/api.php",
-                        content: {action:"query", prop:"revisions",rvprop:"content", format: "json",titles: this.innerHTML, indexpageids:""},
+                        content: {action:"query", prop:"revisions",rvprop:"content", format: "json",titles: dojo.attr(this,"osgeo_item_title"), indexpageids:""},
                         callbackParamName: "callback"
                     }).then(function(data){
                         var pages=[];
@@ -34,15 +35,25 @@
             }).then(function(data){
                //Loop through the data results and create an array containing
                //each tweet's text wrapped in an LI
-               var bijeenkomsten=[];
+              
+               var bijeenkomstenDiv = dojo.byId("bijeenkomsten");
+               var ul =dojo.create('ul',null,bijeenkomstenDiv);
                dojo.forEach(data.query.pageids,function(pageid){
                    dojo.forEach(data.query.pages[pageid].links, function(item,idx){
-                      bijeenkomsten.push('<li class="osgeolink" id="p'+pageid+ '_' + idx + '">' + item.title + '</li>');
+                       var titleArr = item.title.split("/");
+                       
+                       var osgeoLink = dojo.create("li", {
+                           "class": "osgeolink",
+                           innerHTML: titleArr[titleArr.length -1]
+                       }, ul);
+                       dojo.attr(osgeoLink,"osgeo_item_title", item.title);
+                      //bijeenkomsten.push('<li class="osgeolink" id="p'+pageid+ '_' + idx + '">' + item.title + '</li>');
+                      //.data("updated", new Date())
                    });
                });
               //join the array of LIs together and make them the
               //innerHTML of the content holding node.
-              dojo.byId("bijeenkomsten").innerHTML = bijeenkomsten.join('');
+              
                 dojo.query(".osgeolink").connect("onclick", osgeoclick.onClick);
             });
         });
