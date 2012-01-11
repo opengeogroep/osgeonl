@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>OSGeo.nl - De Nederlandstalige Afdeling van OSGeo</title>
+  <meta name="generator" content="gedit-ubuntu">
+  <script src="script/dojo.js"></script>
+  <script src="script/wiky.js"></script>
+  <script>
+        var osgeoclick;
+        dojo.require("dojo.io.script");
+        dojo.ready(function(){
+            osgeoclick = {
+                onClick: function(evt){
+                    dojo.io.script.get({
+                        url: "http://wiki.osgeo.org/api.php",
+                        content: {action:"query", prop:"revisions",rvprop:"content", format: "json",titles: this.innerHTML, indexpageids:""},
+                        callbackParamName: "callback"
+                    }).then(function(data){
+                        var pages=[];
+                        dojo.forEach(data.query.pageids,function(pageid){
+                            pages.push(data.query.pages[pageid].revisions[0]["*"]);
+                        });
+                        dojo.byId("page").innerHTML =wiky.process(pages.join(''));
+                    });
+                }
+            };
+           
+            dojo.byId("footer").innerHTML = 'powered by <a href="http://dojotoolkit.org"> dojo toolkit</a> ' + dojo.version + '  de content van deze website wordt geaggregeerd uit de <a href="http://wiki.osgeo.org/wiki/Nederlands">osgeo.org wiki</a>';
+            dojo.io.script.get({
+                url: "http://wiki.osgeo.org/api.php",
+                content: {action: "query", prop:"links", titles:"Nederlands/bijeenkomsten",format:"json", indexpageids:""},
+                callbackParamName: "callback"
+            }).then(function(data){
+               //Loop through the data results and create an array containing
+               //each tweet's text wrapped in an LI
+               var bijeenkomsten=[];
+               dojo.forEach(data.query.pageids,function(pageid){
+                   dojo.forEach(data.query.pages[pageid].links, function(item,idx){
+                      bijeenkomsten.push('<li class="osgeolink" id="p'+pageid+ '_' + idx + '">' + item.title + '</li>');
+                   });
+               });
+              //join the array of LIs together and make them the
+              //innerHTML of the content holding node.
+              dojo.byId("bijeenkomsten").innerHTML = bijeenkomsten.join('');
+                dojo.query(".osgeolink").connect("onclick", osgeoclick.onClick);
+            });
+        });
+  </script>
+  <style type="text/css">
+    body {
+        color: #00AA00;
+        background: #DDDDDD;
+        font-size: 10.5pt;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+    
+    h1 {
+        font-size: 14pt;
+    }
+
+    a:link, a:visited, a:active, a:hover {
+        color: #00AA00;
+    }
+
+    a:hover {
+        color: #CC0000;
+    }
+    #page {
+        font-size: 10.5pt;
+        margin-top: 20px;
+        padding: 10px;
+        color: #444444;
+        background-color: #ffffff;
+
+    }
+
+    #footer {
+        margin-top: 20px;
+        color: #444444;
+    }
+
+    </style>
+</head>
+
+<body>
+
+<div id="content">
+  <a href="http://wiki.osgeo.org/wiki/Nederlands"><img border="0" src="media/osgeonl-logo.png" alt="OSGeoNL logo"></a>
+</div>
+<div id="bijeenkomsten"></div>
+<div id="page"></div>
+<div id="footer"></div>
+
+</body>
+</html>
+

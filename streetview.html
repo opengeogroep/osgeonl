@@ -1,0 +1,50 @@
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <script src="http://maps.google.com/maps?file=api&amp;v=2.x&amp;key=ABQIAAAAiqmyJfA4zpO2iKEW2RLu3RSRMaGBmULOPQ3MyQaqETezdG8bSRTrCiG8YdJQElW9lmz8ao6XdLeZ-g" type="text/javascript"></script>
+	<script src="proj4js-combined.js"></script>
+    <script type="text/javascript">
+    
+    var myPano;
+
+function gup( name )
+{
+  name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+  var regexS = "[\\?&]"+name+"=([^&#]*)";
+  var regex = new RegExp( regexS );
+  var results = regex.exec(this.location.href);
+  if( results == null )
+    return "";
+  else
+    return results[1];
+}
+
+function initialize (rdx,rdy)
+{
+	// Calculate WGS84 coördinates
+Proj4js.defs["EPSG:28992"]="+title=RD +proj=sterea +lat_0=52.15616055555555 +lon_0=5.38763888888889 +k=0.999908 +x_0=155000 +y_0=463000 +ellps=bessel +units=m +towgs84=565.2369,50.0087,465.658,-0.406857330322398,0.350732676542563,-1.8703473836068,4.0812 +no_defs";
+
+var source = new Proj4js.Proj('EPSG:28992');
+var dest = new Proj4js.Proj('WGS84');
+rdx=parseFloat(gup('x'));
+rdy=parseFloat(gup('y'));
+var p = new Proj4js.Point(rdx,rdy);
+Proj4js.transform(source, dest, p);
+      var googlestreet = new GLatLng(p.y,p.x);
+      panoramaOptions = { latlng:googlestreet };
+      myPano = new GStreetviewPanorama(document.getElementById("pano"), panoramaOptions);
+      GEvent.addListener(myPano, "error", handleNoFlash);
+	  document.getElementById("pano").style.display = "block";
+    }
+    
+    function handleNoFlash(errorCode) {
+	 	     document.getElementById("pano").style.display = "none";
+             alert("Geen Streetview bestand gevonden of geen Flash in uw browser beschikbaar");
+        return;
+    }  
+    </script>
+</HEAD>
+<BODY onload="initialize();" onunload="GUnload();">
+  <center><div name="pano" id="pano" style="width: 500px; height: 300px;display:block;"></div><center>
+</BODY>
+</HTML>
