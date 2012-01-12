@@ -16,6 +16,8 @@ wiky.process = function(wikitext) {
             html += "<h2>" + line.substring(3, line.length - 3) + "</h2>";
         } else if (line.match(/^==/) != null && line.match(/==$/) != null) {
             html += "<h3>" + line.substring(2, line.length - 2) + "</h3>";
+        } else if (line.match(/^=/) != null && line.match(/=$/) != null) {
+                html += "<h1>" + line.substring(2, line.length - 2) + "</h1>";
         } else if (line.match(/^:+/) != null) {
             // find start line and ending line
             start = i;
@@ -47,7 +49,7 @@ wiky.process = function(wikitext) {
         } else {
             html += wiky.process_normal(line);
         }
-        html += "<br/>\n";
+        
     }
     return html;
 };
@@ -86,7 +88,7 @@ wiky.process_indent = function(lines, start, end) {
 wiky.process_bullet_point = function(lines, start, end) {
     var i;
 
-    var html = (lines[start].charAt(0) == '*') ? "<ul>" : "<ol>";
+    var html = (lines[start].charAt(0) === '*') ? "<ul>" : "<ol>";
 
     for (i = start; i <= end; i++) {
 
@@ -106,8 +108,7 @@ wiky.process_bullet_point = function(lines, start, end) {
                     break;
                 else {
                     if (lines[j].charAt(nested_count) == ':') {
-                        html += "<br/>"
-                                + wiky.process_normal(lines[j]
+                        html += wiky.process_normal(lines[j]
                                         .substring(nested_count + 2));
                         nested_end = j;
                     } else {

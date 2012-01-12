@@ -9,6 +9,18 @@
   <script>
         var osgeoclick;
         dojo.require("dojo.io.script");
+        dojo.io.script.get({
+            url: "http://wiki.osgeo.org/api.php",
+            content: {action:"query", prop:"revisions",rvprop:"content", format: "json",titles: "Nederlands", indexpageids:""},
+            callbackParamName: "callback"
+        }).then(function(data){
+            var pages=[];
+            dojo.forEach(data.query.pageids,function(pageid){
+                pages.push(data.query.pages[pageid].revisions[0]["*"]);
+            });
+            dojo.byId("page").innerHTML =wiky.process(pages.join(''));
+        });
+        
         dojo.ready(function(){
             osgeoclick = {
                 onClick: function(evt){
@@ -38,6 +50,12 @@
               
                var bijeenkomstenDiv = dojo.byId("bijeenkomsten");
                var ul =dojo.create('ul',null,bijeenkomstenDiv);
+               var osgeoLink = dojo.create("li", {
+                   "class": "osgeolink",
+                   innerHTML: "Home"
+               }, ul);
+               dojo.attr(osgeoLink,"osgeo_item_title", "Nederlands");
+               
                dojo.forEach(data.query.pageids,function(pageid){
                    dojo.forEach(data.query.pages[pageid].links, function(item,idx){
                        var titleArr = item.title.split("/");
@@ -60,8 +78,7 @@
   </script>
   <style type="text/css">
     body {
-        color: #00AA00;
-        background: #DDDDDD;
+        color: #49a942;
         font-size: 10.5pt;
         font-family: Arial, Helvetica, sans-serif;
     }
@@ -79,7 +96,6 @@
     }
     #page {
         font-size: 10.5pt;
-        margin-top: 20px;
         padding: 10px;
         color: #444444;
         background-color: #ffffff;
@@ -90,7 +106,25 @@
         margin-top: 20px;
         color: #444444;
     }
-
+    #bijeenkomsten {
+    	left: 307px;
+    	position: absolute;
+    	top: 92px;
+    }
+	#bijeenkomsten li {
+		display: inline;
+		border-right:1px solid #cccccc;
+		list-style-type: none;
+		padding-left: 5px;
+    	padding-right: 5px;
+		cursor:pointer;
+	}
+	#bijeenkomsten ul {
+		margin: 0;
+		border-left:1px solid #cccccc;
+		padding-left: 6px;
+    	padding-top: 3px;
+	}
     </style>
 </head>
 
